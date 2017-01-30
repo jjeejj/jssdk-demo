@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "debug": "supervisor ./bin/www"
+    "supervisor": "supervisor ./bin/www",
+    "node-debug": "node-debug ./bin/www"
   },
   "dependencies": {
     "body-parser": "~1.15.2",
