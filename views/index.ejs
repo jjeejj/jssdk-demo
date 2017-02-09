@@ -6,10 +6,18 @@
     </head>
     <body>
         <button type="button" id="search">Beacons信息</button>
+		<p id="info"></p>
+		<p id="info1"></p>
+		<p id="BeaconsNum"></p>
         <p id="Beacons"></p>
+		<p id="BeaconsShow"></p>
         <script src="//cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
         <script src="http://res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
         <script>
+		
+			var major = "";
+			var minor = "";
+			
             wx.config({
                 debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
                 appId: '<%= info.appId %>', // 必填，公众号的唯一标识
@@ -38,6 +46,7 @@
                 wx.startSearchBeacons({
                     ticket:'',
                     complete:function(argv) {
+						$('#info').text('已开启查找周边ibeacon设备接口'+argv.errMsg);
                         console.log('startSearchBeacons',argv)
                     }
                 });
@@ -46,8 +55,38 @@
                 wx.onSearchBeacons({
                     complete:function(argv) {
                         console.log('onSearchBeacons',argv);
-
-                        $('#Beacons').text('Beacons'+argv);
+						$('#info1').text('监听周边ibeacon设备接口');
+						
+                        $('#BeaconsNum').text('Beacons'+argv.beacons.length);
+                        $('#Beacons').text('Beacons'+argv.beacons[0].accuracy+'major:'+argv.beacons[0].major);
+						
+						//major = argv.beacons[0].major;
+						
+						var beacons = argv.beacons;
+						major = beacons[0].major; //默认是第一个
+						minor = beacons[0].minor;
+						var accuracy = beacons[0].accuracy
+						for(var i = 1; i <beacons.length; i++ ){
+							if(accuracy > beacons[i].accuracy){
+								major = beacons[i].major;
+								minor = beacons[j].minor;
+								accuracy = beacons[i].accuracy;
+							}
+						}
+						if(major=="10098" && minor == "13771"){ //第一个
+							$('#BeaconsShow').text('Beacons 提走');
+							window.location.href = "/users/test1";
+						}
+						
+						if(major=="10098" && minor == "13770"){ //第二个
+							$('#BeaconsShow').text('Beacons 提走');
+							window.location.href = "/users/test2";
+						}
+						
+						if(major=="10098" && minor == "13769"){ //第三个
+							$('#BeaconsShow').text('Beacons 提走');
+							window.location.href = "/users/test3";
+						}
 
                     }
                 }); 

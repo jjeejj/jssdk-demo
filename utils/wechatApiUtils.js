@@ -15,7 +15,7 @@ var getAccessToken = function() {
     //先从文件中获取
     // var accessTokenInfo = fs.readFileSync(path.join(__dirname,'../files/accessToken.json'),'utf8');
     var accessTokenInfo = "";
-    fileUtils.readFile(path.join(__dirname, '../files/accessToken.json'))
+    return fileUtils.readFile(path.join(__dirname, '../files/accessToken.json'))
         .then(function(data) {
             if (!data) { //没有值,重新获取的不需要判断时间
                 updateAccessToken().then(function(data) {
@@ -87,7 +87,7 @@ var updateAccessToken = function() {
     // });
 
     //Promise改写
-    requestPromise(wechatApi.getAccessToken.replace('APPID', wechatConfig.test.appID).replace('APPSECRET', wechatConfig.test.appsecret))
+  return  requestPromise(wechatApi.getAccessToken.replace('APPID', wechatConfig.test.appID).replace('APPSECRET', wechatConfig.test.appsecret))
         .then(function(body) {
             console.log('body', body);
             var bodyObj = JSON.parse(body); //格式化为对象
@@ -95,6 +95,9 @@ var updateAccessToken = function() {
             body = JSON.stringify(bodyObj, null, 4);
             fileUtils.writeFile(path.join(__dirname, '../files/accessToken.json'), body);
 
+            // return new Promise(function(resolve, reject) {
+            //     resolve(body);
+            // }
             return body;
         })
         .catch(function(err) {
@@ -112,7 +115,7 @@ var getJsapiTicket = function() {
 
     //先从文件中获取
     // var jsapiTicketInfo = fs.readFileSync(path.join(__dirname, '../files/jsapiTicket.json'), 'utf8');
-    fileUtils.readFile(path.join(__dirname, '../files/jsapiTicket.json'))
+    return fileUtils.readFile(path.join(__dirname, '../files/jsapiTicket.json'))
         .then(function(data) {
             if (!data) { //没有值,重新获取的不需要判断时间
                 updateJsapiTicket().then(function(data) {
@@ -120,6 +123,8 @@ var getJsapiTicket = function() {
                     return jsapiTicketInfo.ticket; //返回ticket
                 })
             }
+
+            // console.log('=================')
             jsapiTicketInfo = JSON.parse(data); //格式化为对象
             if (jsapiTicketInfo && jsapiTicketInfo.jsapi_expires_in && jsapiTicketInfo.errmsg == 'ok') {
                 if (Date.now() < jsapiTicketInfo.jsapi_expires_in) {
@@ -168,11 +173,11 @@ var updateJsapiTicket = function() {
     getAccessToken().then(function(data) {
         console.log('用于更新用的accessToken', data);
         //Promise改写
-        requestPromise(wechatApi.getJsapiTicket.replace('ACCESS_TOKEN', data))
+        return requestPromise(wechatApi.getJsapiTicket.replace('ACCESS_TOKEN', data))
             .then(function(body) {
                 console.log('body', body);
                 var bodyObj = JSON.parse(body); //格式化为对象
-                bodyObj.api_expires_in = Date.now() + bodyObj.expires_in * 1000 - 20 * 1000 //提前20s获取,该值存的是ms
+                bodyObj.jsapi_expires_in = Date.now() + bodyObj.expires_in * 1000 - 20 * 1000 //提前20s获取,该值存的是ms
                 body = JSON.stringify(bodyObj, null, 4);
                 fileUtils.writeFile(path.join(__dirname, '../files/jsapiTicket.json'), body);
                 return body;
@@ -301,5 +306,6 @@ module.exports = {
     getJsapiTicket: getJsapiTicket,
     getDeviceGroupList: getDeviceGroupList,
     addDeviceGroup: addDeviceGroup,
-    adddeviceToGroup: adddeviceToGroup
+    adddeviceToGroup: adddeviceToGroup,
+    updateAccessToken:updateAccessToken
 }

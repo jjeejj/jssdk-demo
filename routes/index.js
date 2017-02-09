@@ -56,7 +56,7 @@ router.get('/jssdk', function(req, res, next) {
 
             console.log('info', info)
 
-            res.render('index', {
+            res.render('share', {
                 info: info
             });
         }).catch(function () {
